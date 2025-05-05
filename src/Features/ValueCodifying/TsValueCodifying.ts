@@ -57,7 +57,7 @@ export namespace TsValueCodifying {
 		} else if (v_type === "Color3") {
 			const value = v as Color3;
 			const [r, g, b] = [value.R, value.G, value.B].map((v) => math.floor(v * 255));
-			return `new Color3(${r}, ${g}, ${b})`;
+			return `Color3.fromRGB(${r}, ${g}, ${b})`;
 		} else if (v_type === "ColorSequenceKeypoint") {
 			const value = v as ColorSequenceKeypoint;
 			return `new ColorSequenceKeypoint(${Codify(value.Time)}, ${Codify(value.Value)})`;
