@@ -97,6 +97,7 @@ export namespace ReactCodifier {
 
 		let nodes_of_same_name_and_smaller_id = 0;
 		for (const [, other_node_id] of registry) {
+			if (other_node_id.Id === node.Id) continue;
 			if (other_node_id.ParentId !== node.ParentId) continue;
 			if (other_node_id.Id > node.Id) continue;
 			if (other_node_id.Properties.get("Name")!.Value !== name) continue;
