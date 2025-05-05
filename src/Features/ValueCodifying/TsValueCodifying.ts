@@ -65,7 +65,7 @@ export namespace TsValueCodifying {
 		} else if (v_type === "ColorSequence") {
 			const value = v as ColorSequence;
 			const keypoints = value.Keypoints.map((kp) => Codify(kp));
-			return `new ColorSequence(${keypoints.join(", ")})`;
+			return `new ColorSequence([${keypoints.join(", ")}])`;
 		} else if (v_type === "NumberRange") {
 			const value = v as NumberRange;
 			return `new NumberRange(${Codify(value.Min)}, ${Codify(value.Max)})`;
@@ -77,7 +77,7 @@ export namespace TsValueCodifying {
 		} else if (v_type === "NumberSequence") {
 			const value = v as NumberSequence;
 			const keypoints = value.Keypoints.map((kp) => Codify(kp));
-			return `new NumberSequence(${keypoints.join(", ")})`;
+			return `new NumberSequence([${keypoints.join(", ")}])`;
 		} else if (v_type === "Ray") {
 			const value = v as Ray;
 			return `new Ray(${Codify(value.Origin)}, ${Codify(value.Direction)})`;
