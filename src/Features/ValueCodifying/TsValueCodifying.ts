@@ -146,7 +146,7 @@ export namespace TsValueCodifying {
 			return `new Vector3int16(${Codify(value.X)}, ${Codify(value.Y)}, ${Codify(value.Z)})`;
 		} else if (v_type === "Font") {
 			const value = v as Font;
-			return `new Font(${value.Family}, ${value.Weight}, ${value.Style})`;
+			return `new Font("${value.Family}", ${value.Weight}, ${value.Style})`;
 		} else if (v_type === "FloatCurveKey") {
 			const value = v as FloatCurveKey;
 			return `new FloatCurveKey(${Codify(value.Time)}, ${Codify(value.Value)})`;
