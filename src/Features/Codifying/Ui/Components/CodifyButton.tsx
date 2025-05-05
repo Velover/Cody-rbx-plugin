@@ -6,5 +6,9 @@ interface CodifyButtonProps {
 }
 
 export function CodifyButton({ onClick }: CodifyButtonProps) {
-	return <Button text="Codify Selection" onClick={onClick} />;
+	return (
+		<Button text="Codify Selection" onClick={onClick}>
+			<uiflexitem FlexMode={Enum.UIFlexMode.Fill} />
+		</Button>
+	);
 }

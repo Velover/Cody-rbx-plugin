@@ -13,18 +13,17 @@ export function OutputWindow({ outputText, setOutputText, layoutOrder }: OutputW
 
 	const handleCopyClick = () => {
 		const textbox = textBoxRef.current;
-		if (textbox) {
-			// Temporarily enable text editing to allow selection
-			textbox.TextEditable = true;
-			textbox.CaptureFocus();
-			textbox.SelectionStart = 0;
-			textbox.CursorPosition = outputText.size();
+		if (textbox === undefined) return;
+		// Temporarily enable text editing to allow selection
+		textbox.TextEditable = true;
+		textbox.CaptureFocus();
+		textbox.SelectionStart = 0;
+		textbox.CursorPosition = outputText.size() + 1;
 
-			// Wait for copy operation before disabling edit
-			task.delay(0.1, () => {
-				textbox.TextEditable = false;
-			});
-		}
+		// Wait for copy operation before disabling edit
+		task.delay(0.1, () => {
+			textbox.TextEditable = false;
+		});
 	};
 
 	return (
@@ -63,7 +62,7 @@ export function OutputWindow({ outputText, setOutputText, layoutOrder }: OutputW
 				BorderSizePixel={0}
 				ScrollBarImageColor3={CodifyingResources.COLORS.BORDER}
 				ScrollBarThickness={8}
-				CanvasSize={UDim2.fromScale(1, 1)}
+				CanvasSize={new UDim2()}
 				AutomaticCanvasSize={Enum.AutomaticSize.Y}
 				LayoutOrder={2}
 			>

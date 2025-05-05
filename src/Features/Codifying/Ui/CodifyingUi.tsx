@@ -1,5 +1,5 @@
 import { useFlameworkDependency } from "@rbxts/flamework-react-utils";
-import React, { useState } from "@rbxts/react";
+import React, { useMemo, useState } from "@rbxts/react";
 import { CodifyingController } from "../Controllers/CodifyingController";
 import { CodifyingResources } from "../Resources/CodifyingResources";
 import { Checkbox } from "./Components/Checkbox";
@@ -13,23 +13,27 @@ export function CodifyingUi() {
 	const [outputText, setOutputText] = useState("");
 	const [usePrint, setUsePrint] = useState(false);
 
+	const selected_instances = useMemo(() => {
+		return instanceTree.map((data) => data.Instance);
+	}, [instanceTree]);
+
 	// Get exceptions from controller
-	const exceptions = codifyingController.useExceptions(instanceTree.map((data) => data.Instance));
+	const exceptions = codifyingController.useExceptions(selected_instances);
 
 	// Toggle instance exception
 	const toggleException = (instance: Instance) => {
 		if (exceptions.includes(instance)) {
 			codifyingController.RemoveException(instance);
-		} else {
-			codifyingController.AddException(instance);
+			return;
 		}
+		codifyingController.AddException(instance);
 	};
 
 	// Handle codify action
 	const handleCodify = () => {
 		// Get instances excluding exceptions
 		const instances = instanceTree
-			.filter((data) => !exceptions.includes(data.Instance))
+			.filter((data) => !full_exceptions_set.has(data.Instance))
 			.map((data) => data.Instance);
 
 		if (instances.size() === 0) {
@@ -40,13 +44,25 @@ export function CodifyingUi() {
 		// Get code from controller
 		const code = codifyingController.CodifyInstances(instances);
 
-		if (usePrint) {
+		const size_bigger_than_200k = code.size() >= 200000;
+
+		if (usePrint || size_bigger_than_200k) {
 			print(code);
 			setOutputText("// Code printed to output");
 		} else {
 			setOutputText(code);
 		}
 	};
+
+	const full_exceptions_set = useMemo(() => {
+		const full_exceptions = new Set<Instance>(exceptions);
+		for (const exception of exceptions) {
+			for (const descendant of exception.GetDescendants()) {
+				full_exceptions.add(descendant);
+			}
+		}
+		return full_exceptions;
+	}, [selected_instances, exceptions]);
 
 	return (
 		<frame
@@ -107,7 +123,7 @@ export function CodifyingUi() {
 						<InstanceItem
 							key={`instance_${index}`}
 							instanceData={data}
-							isExcluded={exceptions.includes(data.Instance)}
+							isExcluded={full_exceptions_set.has(data.Instance)}
 							onToggle={() => toggleException(data.Instance)}
 							layoutOrder={index}
 						/>

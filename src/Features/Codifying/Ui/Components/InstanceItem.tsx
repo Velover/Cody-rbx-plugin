@@ -80,7 +80,7 @@ export function InstanceItem({
 						CodifyingResources.SIZES.CHECKBOX_SIZE,
 					)}
 					BackgroundColor3={
-						isExcluded
+						!isExcluded
 							? CodifyingResources.COLORS.CHECKBOX_FILL
 							: CodifyingResources.COLORS.CHECKBOX_BACKGROUND
 					}
@@ -92,7 +92,7 @@ export function InstanceItem({
 				>
 					<uicorner CornerRadius={new UDim(0, 2)} />
 
-					{isExcluded && (
+					{!isExcluded && (
 						<imagelabel
 							Size={UDim2.fromScale(0.7, 0.7)}
 							Position={UDim2.fromScale(0.5, 0.5)}

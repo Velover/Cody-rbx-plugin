@@ -15,7 +15,7 @@ export namespace ReactCodifier {
 		const node_property_exceptions_map = new Map<number, string[]>();
 
 		for (const [, node] of registry) {
-			const property_name_exceptions: string[] = ["Name", "Parent"];
+			const property_name_exceptions: string[] = ["Name", "Parent", "Source", "TextureContent"];
 			node_property_exceptions_map.set(node.Id, property_name_exceptions);
 			//checks for undefined properties
 			//remove name
@@ -58,18 +58,16 @@ export namespace ReactCodifier {
 		const result: string[] = [];
 
 		if (fragment_required) {
-			result.push("<>\n");
+			result.push("<>");
 		}
 
 		for (const root_id of ast.Roots) {
 			const root_node = registry.get(root_id)!;
-			result.push(
-				NodeToTsx(root_node, registry, node_property_exceptions_map, fragment_required ? 1 : 0),
-			);
+			result.push(NodeToTsx(root_node, registry, node_property_exceptions_map));
 		}
 
 		if (fragment_required) {
-			result.push("</>\n");
+			result.push("</>");
 		}
 
 		return result.join("");
@@ -80,9 +78,7 @@ export namespace ReactCodifier {
 		node: InstanceAST.IInstanceNode,
 		registry: Map<number, InstanceAST.IInstanceNode>,
 		property_exceptions_map: Map<number, string[]>,
-		indent_level: number,
 	): string {
-		const indent = "\t".rep(indent_level);
 		const name = node.Properties.get("Name")!.Value;
 		const has_children = node.ChildrenIds.size() > 0;
 
@@ -91,7 +87,7 @@ export namespace ReactCodifier {
 		const result: string[] = [];
 
 		// Start the tag
-		result.push(`${indent}<${node.ClassName.lower()}`);
+		result.push(`<${node.ClassName.lower()}`);
 
 		// Add key attribute
 		result.push(` key="${name}"`);
@@ -107,19 +103,19 @@ export namespace ReactCodifier {
 		}
 
 		if (!has_children) {
-			result.push(" />\n");
+			result.push(" />");
 			return result.join("");
 		}
-		result.push(">\n");
+		result.push(">");
 
 		// Process children
 		for (const child_id of node.ChildrenIds) {
 			const child_node = registry.get(child_id)!;
-			result.push(NodeToTsx(child_node, registry, property_exceptions_map, indent_level + 1));
+			result.push(NodeToTsx(child_node, registry, property_exceptions_map));
 		}
 
 		// Close opening tag
-		result.push(`${indent}</${node.ClassName.lower()}>\n`);
+		result.push(`</${node.ClassName.lower()}>`);
 
 		return result.join("");
 	}

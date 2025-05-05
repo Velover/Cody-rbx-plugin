@@ -1,10 +1,10 @@
 import { Controller, OnInit, OnStart } from "@flamework/core";
-import { atom, peek } from "@rbxts/charm";
+import { atom } from "@rbxts/charm";
 import { useEffect, useMemo, useState } from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { Selection, StudioService } from "@rbxts/services";
-import { InstanceAST } from "../../InstanceAST/InstanceAST";
 import { ReactCodifier } from "../../Codifiers/ReactCodifier";
+import { InstanceAST } from "../../InstanceAST/InstanceAST";
 
 @Controller()
 export class CodifyingController implements OnInit, OnStart {
@@ -76,13 +76,7 @@ export class CodifyingController implements OnInit, OnStart {
 
 	public useExceptions(selected_instances: Instance[]): Instance[] {
 		useEffect(() => {
-			const value = peek(this.exceptions_atom_);
-			const exceptions = value.filter((v) => selected_instances.includes(v));
-			if (exceptions.size() === 0) return;
-			this.exceptions_atom_((prev) => {
-				const new_exceptions = prev.filter((v) => !exceptions.includes(v));
-				return new_exceptions;
-			});
+			this.exceptions_atom_((p) => p.filter((v) => selected_instances.includes(v)));
 		}, [selected_instances]);
 
 		return useAtom(this.exceptions_atom_);

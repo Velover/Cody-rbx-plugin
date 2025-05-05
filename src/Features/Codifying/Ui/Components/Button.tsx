@@ -1,4 +1,4 @@
-import React, { useState } from "@rbxts/react";
+import React, { PropsWithChildren, useState } from "@rbxts/react";
 import { CodifyingResources } from "../../Resources/CodifyingResources";
 
 interface ButtonProps {
@@ -11,7 +11,8 @@ export function Button({
 	text,
 	onClick,
 	size = new UDim2(1, 0, 0, CodifyingResources.SIZES.BUTTON_HEIGHT),
-}: ButtonProps) {
+	children,
+}: PropsWithChildren<ButtonProps>) {
 	const [isHovered, setIsHovered] = useState(false);
 
 	return (
@@ -33,6 +34,7 @@ export function Button({
 			}}
 		>
 			<uicorner CornerRadius={new UDim(0, CodifyingResources.SIZES.CORNER_RADIUS)} />
+			{children}
 		</textbutton>
 	);
 }
