@@ -26,6 +26,7 @@
 	},
 	"dependencies": {
 		"@flamework/core": "^1.3.1",
+		"@rbxts/api-dump-fetcher": "^1.0.2",
 		"@rbxts/charm": "^0.10.0",
 		"@rbxts/flamework-react-utils": "^1.0.6",
 		"@rbxts/react": "^17.2.3",
