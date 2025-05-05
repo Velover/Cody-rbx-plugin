@@ -7,15 +7,15 @@ import { App } from "../UI/App";
 
 @Controller({})
 export class PluginUiController implements OnInit, OnStart, OnUnload {
-	private readonly PLUGIN_WIDGET_ID = "SomePluginId";
-	private readonly PLUGIN_DEFAULT_WIDGET_TITLE = "Plugin Title";
+	private readonly PLUGIN_WIDGET_ID = "CodyWidget";
+	private readonly PLUGIN_DEFAULT_WIDGET_TITLE = "Cody";
 
-	private readonly PLUGIN_TOOLBAR_ID = "SomePluginToolbarId";
+	private readonly PLUGIN_TOOLBAR_ID = "CodyToolbar";
 
-	private readonly PLUGIN_BUTTON_ID = "SomePluginButtonId";
-	private readonly PLUGIN_BUTTON_TOOLTIP = "Tooltip for the plugin button";
+	private readonly PLUGIN_BUTTON_ID = "ToggleCody";
+	private readonly PLUGIN_BUTTON_TOOLTIP = "Toggle Cody";
 	private readonly PLUGIN_BUTTON_ICON_ID = "rbxassetid://1234567890"; // Replace with your icon ID
-	private readonly PLUGIN_BUTTON_TEXT = "Plugin Button";
+	private readonly PLUGIN_BUTTON_TEXT = "Cody";
 
 	private _widgetInfo = new DockWidgetPluginGuiInfo(
 		Enum.InitialDockState.Float,
