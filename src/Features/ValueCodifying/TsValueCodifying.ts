@@ -150,6 +150,10 @@ export namespace TsValueCodifying {
 		} else if (v_type === "FloatCurveKey") {
 			const value = v as FloatCurveKey;
 			return `new FloatCurveKey(${Codify(value.Time)}, ${Codify(value.Value)})`;
+		} else if (v_type === ("Content" as never)) {
+			const value = v as Content;
+			if (value.SourceType === Enum.ContentSourceType.None) return `Content.none`;
+			if (value.SourceType === Enum.ContentSourceType.Uri) return `Content.fromUri("${value.Uri}")`;
 		}
 
 		return "undefined";
