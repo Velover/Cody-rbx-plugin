@@ -3,6 +3,8 @@ import { atom, peek } from "@rbxts/charm";
 import { useEffect, useMemo, useState } from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { Selection, StudioService } from "@rbxts/services";
+import { InstanceAST } from "../../InstanceAST/InstanceAST";
+import { ReactCodifier } from "../../Codifiers/ReactCodifier";
 
 @Controller()
 export class CodifyingController implements OnInit, OnStart {
@@ -17,7 +19,7 @@ export class CodifyingController implements OnInit, OnStart {
 			const connection = selection_serivce.SelectionChanged.Connect(() => {
 				SetSelected(Selection.Get());
 			});
-			return connection.Disconnect();
+			return () => connection.Disconnect();
 		}, []);
 
 		return useMemo(() => {
@@ -84,6 +86,21 @@ export class CodifyingController implements OnInit, OnStart {
 		}, [selected_instances]);
 
 		return useAtom(this.exceptions_atom_);
+	}
+
+	public CodifyInstances(instances: Instance[]): string {
+		if (instances.size() === 0) {
+			return "// No instances selected for codifying";
+		}
+
+		try {
+			// Build AST from instances
+			const ast = InstanceAST.BuildAst(instances);
+			// Use ReactCodifier to convert AST to code
+			return ReactCodifier.Codify(ast);
+		} catch (err) {
+			return `// Error during codification: ${err}`;
+		}
 	}
 
 	private exceptions_atom_ = atom<Instance[]>([]);

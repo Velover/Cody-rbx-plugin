@@ -193,5 +193,7 @@ export namespace InstanceAST {
 			};
 			instance_ast.Registry.set(id, instance_node);
 		}
+
+		return instance_ast;
 	}
 }
