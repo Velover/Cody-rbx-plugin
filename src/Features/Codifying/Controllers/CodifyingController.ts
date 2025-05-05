@@ -3,24 +3,30 @@ import { atom } from "@rbxts/charm";
 import { useEffect, useMemo, useState } from "@rbxts/react";
 import { useAtom } from "@rbxts/react-charm";
 import { Selection, StudioService } from "@rbxts/services";
+import { PluginUiController } from "Features/PluginUI/Controllers/PluginUiController";
 import { ReactCodifier } from "../../Codifiers/ReactCodifier";
 import { InstanceAST } from "../../InstanceAST/InstanceAST";
 
 @Controller()
 export class CodifyingController implements OnInit, OnStart {
-	constructor() {}
+	constructor(private readonly pluginUiController: PluginUiController) {}
 	onInit(): void {}
 	onStart(): void {}
 
 	public useSelectedInstanceTree(): CodifyingController.InstanceTree {
 		const [selected, SetSelected] = useState<Instance[]>([]);
-		const selection_serivce = Selection as Selection & { SelectionChanged: RBXScriptSignal };
+		const is_wigdet_enabled = this.pluginUiController.useIsEnabled();
+
 		useEffect(() => {
+			const selection_serivce = Selection as Selection & { SelectionChanged: RBXScriptSignal };
+			if (!is_wigdet_enabled) return;
+			SetSelected(Selection.Get());
+
 			const connection = selection_serivce.SelectionChanged.Connect(() => {
 				SetSelected(Selection.Get());
 			});
 			return () => connection.Disconnect();
-		}, []);
+		}, [is_wigdet_enabled]);
 
 		return useMemo(() => {
 			const descendants: Instance[] = [];

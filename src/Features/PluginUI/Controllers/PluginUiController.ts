@@ -4,6 +4,8 @@ import ReactRoblox, { createRoot } from "@rbxts/react-roblox";
 import { Controller, OnUnload } from "FlameworkIntegration";
 import { GetPlugin } from "Utils/PluginGetting";
 import { App } from "../UI/App";
+import { atom } from "@rbxts/charm";
+import { useAtom } from "@rbxts/react-charm";
 
 @Controller({})
 export class PluginUiController implements OnInit, OnStart, OnUnload {
@@ -30,6 +32,7 @@ export class PluginUiController implements OnInit, OnStart, OnUnload {
 	private _toolbar!: PluginToolbar;
 	private _toolbarButton!: PluginToolbarButton;
 	private _root?: ReactRoblox.Root;
+	private isEnabledAtom = atom(false);
 
 	constructor() {}
 	onUnload(): void {
@@ -47,10 +50,17 @@ export class PluginUiController implements OnInit, OnStart, OnUnload {
 			this.PLUGIN_BUTTON_TEXT,
 		);
 		this._toolbarButton.Click.Connect(() => this.ToggleEnabled());
+		this._widget.GetPropertyChangedSignal("Enabled").Connect(() => {
+			this.isEnabledAtom(this._widget.Enabled);
+		});
 	}
 	onStart(): void {
 		this._root = createRoot(this._widget);
 		this._root.render(React.createElement(App));
+	}
+
+	public useIsEnabled(): boolean {
+		return useAtom(this.isEnabledAtom);
 	}
 
 	public SetTitle(title: string): void {
