@@ -14,7 +14,7 @@ export class PluginUiController implements OnInit, OnStart, OnUnload {
 
 	private readonly PLUGIN_BUTTON_ID = "ToggleCody";
 	private readonly PLUGIN_BUTTON_TOOLTIP = "Toggle Cody";
-	private readonly PLUGIN_BUTTON_ICON_ID = "rbxassetid://97934201850756";
+	private readonly PLUGIN_BUTTON_ICON_ID = "rbxassetid://99623754147999";
 	private readonly PLUGIN_BUTTON_TEXT = "Cody";
 
 	private _widgetInfo = new DockWidgetPluginGuiInfo(
