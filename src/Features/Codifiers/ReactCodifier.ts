@@ -12,9 +12,11 @@ export namespace ReactCodifier {
 			}
 		}
 
-		const property_name_exceptions: string[] = ["Name", "Parent"];
+		const node_property_exceptions_map = new Map<number, string[]>();
 
 		for (const [, node] of registry) {
+			const property_name_exceptions: string[] = ["Name", "Parent"];
+			node_property_exceptions_map.set(node.Id, property_name_exceptions);
 			//checks for undefined properties
 			//remove name
 			//remove parent
@@ -62,7 +64,7 @@ export namespace ReactCodifier {
 		for (const root_id of ast.Roots) {
 			const root_node = registry.get(root_id)!;
 			result.push(
-				NodeToTsx(root_node, registry, property_name_exceptions, fragment_required ? 1 : 0),
+				NodeToTsx(root_node, registry, node_property_exceptions_map, fragment_required ? 1 : 0),
 			);
 		}
 
@@ -77,12 +79,14 @@ export namespace ReactCodifier {
 	function NodeToTsx(
 		node: InstanceAST.IInstanceNode,
 		registry: Map<number, InstanceAST.IInstanceNode>,
-		property_exceptions: string[],
+		property_exceptions_map: Map<number, string[]>,
 		indent_level: number,
 	): string {
 		const indent = "\t".rep(indent_level);
 		const name = node.Properties.get("Name")!.Value;
 		const has_children = node.ChildrenIds.size() > 0;
+
+		const node_property_exceptions = property_exceptions_map.get(node.Id)!;
 
 		const result: string[] = [];
 
@@ -94,7 +98,7 @@ export namespace ReactCodifier {
 
 		// Add properties
 		for (const prop_name of node.DifferentProperties) {
-			if (property_exceptions.includes(prop_name)) continue;
+			if (node_property_exceptions.includes(prop_name)) continue;
 
 			const prop_data = node.Properties.get(prop_name)!;
 			const prop_value = TsValueCodifying.Codify(prop_data.Value);
@@ -111,7 +115,7 @@ export namespace ReactCodifier {
 		// Process children
 		for (const child_id of node.ChildrenIds) {
 			const child_node = registry.get(child_id)!;
-			result.push(NodeToTsx(child_node, registry, property_exceptions, indent_level + 1));
+			result.push(NodeToTsx(child_node, registry, property_exceptions_map, indent_level + 1));
 		}
 
 		// Close opening tag
