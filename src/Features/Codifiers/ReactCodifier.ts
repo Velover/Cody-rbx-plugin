@@ -25,6 +25,11 @@ export namespace ReactCodifier {
 					continue;
 				}
 
+				if (node.Properties.get(diff_property_name)!.Value === undefined) {
+					property_name_exceptions.push(diff_property_name);
+					continue;
+				}
+
 				if (
 					diff_property_name === "BackgroundColor3" &&
 					node.Properties.get("BackgroundTransparency")?.Value === 1
