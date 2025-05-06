@@ -23,7 +23,10 @@ export class CodifyingController implements OnInit, OnStart {
 			SetSelected(Selection.Get());
 
 			const connection = selection_serivce.SelectionChanged.Connect(() => {
-				SetSelected(Selection.Get());
+				const selected = Selection.Get();
+				const selected_set = new Set<Instance>(selected);
+
+				SetSelected(selected.filter((i) => i.Parent !== undefined && !selected_set.has(i)));
 			});
 			return () => connection.Disconnect();
 		}, [is_wigdet_enabled]);

@@ -1,6 +1,7 @@
 import { GuiResources } from "../../PluginUI/Resources/GuiResources";
 
 export namespace CodifyingResources {
+	export const MAX_DISPLAYED_INSTANCES = 1000; // Maximum number of instances to display in the UI
 	// Fonts reference from GuiResources
 	export namespace FONTS {
 		export const REGULAR = GuiResources.FONT_REGULAR;

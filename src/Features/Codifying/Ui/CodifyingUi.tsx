@@ -13,6 +13,8 @@ export function CodifyingUi() {
 	const [outputText, setOutputText] = useState("");
 	const [usePrint, setUsePrint] = useState(false);
 
+	const amount_above_limit = instanceTree.size() > CodifyingResources.MAX_DISPLAYED_INSTANCES;
+
 	const selected_instances = useMemo(() => {
 		return instanceTree.map((data) => data.Instance);
 	}, [instanceTree]);
@@ -119,15 +121,16 @@ export function CodifyingUi() {
 				>
 					<uilistlayout SortOrder={Enum.SortOrder.LayoutOrder} />
 
-					{instanceTree.map((data, index) => (
-						<InstanceItem
-							key={`instance_${index}`}
-							instanceData={data}
-							isExcluded={full_exceptions_set.has(data.Instance)}
-							onToggle={() => toggleException(data.Instance)}
-							layoutOrder={index}
-						/>
-					))}
+					{!amount_above_limit &&
+						instanceTree.map((data, index) => (
+							<InstanceItem
+								key={`instance_${index}`}
+								instanceData={data}
+								isExcluded={full_exceptions_set.has(data.Instance)}
+								onToggle={() => toggleException(data.Instance)}
+								layoutOrder={index}
+							/>
+						))}
 				</scrollingframe>
 			</frame>
 
