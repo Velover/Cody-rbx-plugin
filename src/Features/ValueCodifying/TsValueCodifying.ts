@@ -38,6 +38,8 @@ export namespace TsValueCodifying {
 			const value = v as CFrame;
 			if (value === CFrame.identity) return "CFrame.identity";
 			const values = value.GetComponents();
+			if (value.Rotation === CFrame.identity.Rotation)
+				return `new CFrame(${Codify(values[0])}, ${Codify(values[1])}, ${Codify(values[2])})`;
 			return `new CFrame(${values.map((v) => Codify(v)).join(", ")})`;
 		} else if (v_type === "UDim") {
 			const value = v as UDim;
