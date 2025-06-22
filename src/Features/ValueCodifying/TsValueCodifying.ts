@@ -3,7 +3,7 @@ export namespace TsValueCodifying {
 		const v_type = typeOf(v);
 		if (v_type === "string") {
 			const value = v as string;
-			return `"${value.gsub('"', "'")[0]}"`;
+			return `"${value.gsub('"', "'")[0].gsub("\n", "\\n")[0].gsub("\t", "\\t")[0].gsub("\\", "\\\\")[0]}"`;
 		} else if (v_type === "number") {
 			const value = v as number;
 			if (v === math.huge) return "math.huge";
