@@ -1,4 +1,7 @@
-import { ApiDumpConstants, GetApiDump } from "@rbxts/api-dump-fetcher";
+import { type ReflectedProperty, type ReflectedClass } from "types/Globals";
+
+const ReflectionService = game.GetService("ReflectionService");
+const allCapabilities = new SecurityCapabilities(...Enum.SecurityCapability.GetEnumItems());
 
 export namespace InstanceAST {
 	export interface IInstanceNode {
@@ -86,27 +89,15 @@ export namespace InstanceAST {
 		if (cached_full_instance_property_names_map.has(class_name)) {
 			return cached_full_instance_property_names_map.get(class_name)!;
 		}
-		const api_dump = GetApiDump().expect();
 		const property_names_map = new Map<string, boolean>();
 
-		while (class_name !== ApiDumpConstants.ROOT_SUPER_CLASS) {
-			const instance_data = api_dump.Classes.find((class_data) => {
-				return class_data.Name === class_name;
-			});
-			assert(instance_data, `Instance ${class_name} not found in API dump`);
-
-			for (const member of instance_data.Members) {
-				if (member.MemberType !== ApiDumpConstants.EMemberMemberType.Property) continue;
-				if (member.Tags !== undefined) {
-					if (member.Tags.includes(ApiDumpConstants.EMemberTag.NotScriptable)) continue;
-					if (member.Tags.includes(ApiDumpConstants.EMemberTag.Deprecated)) continue;
-					if (member.Tags.includes(ApiDumpConstants.EMemberTag.Hidden)) continue;
-					if (member.Tags.includes(ApiDumpConstants.EMemberTag.NotBrowsable)) continue;
-				}
-				const is_readonly = member.Tags?.includes(ApiDumpConstants.EMemberTag.ReadOnly) ?? false;
-				property_names_map.set(member.Name, is_readonly);
-			}
-			class_name = instance_data.Superclass;
+		const properties = ReflectionService.GetPropertiesOfClass(class_name, {
+			Security: allCapabilities,
+		}) as Array<ReflectedProperty>;
+		for (const prop of properties) {
+			if (prop.Display?.DeprecationMessage !== undefined) continue;
+			const is_readonly = prop.Permits.Write === undefined;
+			property_names_map.set(prop.Name, is_readonly);
 		}
 
 		cached_full_instance_property_names_map.set(class_name, property_names_map);
@@ -120,11 +111,13 @@ export namespace InstanceAST {
 			return cached_default_instance_properties;
 		}
 
-		const api_dump = GetApiDump().expect();
 		cached_default_instance_properties = new Map<string, Map<string, IPropertyData>>();
 
-		const class_names = api_dump.Classes.map((c) => c.Name);
-		for (const class_name of class_names) {
+		const classes = ReflectionService.GetClasses({
+			Security: allCapabilities,
+		}) as Array<ReflectedClass>;
+		for (const reflectedClass of classes) {
+			const class_name = reflectedClass.Name;
 			const [success, instance] = pcall(() => new Instance(class_name as never) as Instance);
 			if (!success) continue;
 			const property_names_map = GetFullInstancePropertyNamesMap(class_name);
@@ -156,7 +149,10 @@ export namespace InstanceAST {
 		for (const [id, node] of instance_hierarchy.Registry) {
 			const instance = node.Instance;
 			const class_name = instance.ClassName;
-			const is_creatable = default_instance_properties.has(class_name);
+			const reflectedClass = ReflectionService.GetClass(class_name, {
+				Security: allCapabilities,
+			}) as ReflectedClass | undefined;
+			const is_creatable = reflectedClass?.Permits.New !== undefined;
 			const default_properties = default_instance_properties.get(class_name);
 			const property_names_map = GetFullInstancePropertyNamesMap(class_name);
 
@@ -171,6 +167,31 @@ export namespace InstanceAST {
 					Value: v,
 					Readonly: is_readonly,
 				});
+			}
+
+			if (class_name === "UICorner") {
+				const corner_radius = properties.get("CornerRadius")?.Value as UDim | undefined;
+				const top_left = properties.get("TopLeftRadius")?.Value as UDim | undefined;
+				const top_right = properties.get("TopRightRadius")?.Value as UDim | undefined;
+				const bottom_left = properties.get("BottomLeftRadius")?.Value as UDim | undefined;
+				const bottom_right = properties.get("BottomRightRadius")?.Value as UDim | undefined;
+
+				if (corner_radius && top_left && top_right && bottom_left && bottom_right) {
+					const all_same =
+						top_left === corner_radius &&
+						top_right === corner_radius &&
+						bottom_left === corner_radius &&
+						bottom_right === corner_radius;
+
+					if (all_same) {
+						properties.delete("TopLeftRadius");
+						properties.delete("TopRightRadius");
+						properties.delete("BottomLeftRadius");
+						properties.delete("BottomRightRadius");
+					} else {
+						properties.delete("CornerRadius");
+					}
+				}
 			}
 
 			if (default_properties !== undefined) {

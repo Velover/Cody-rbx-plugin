@@ -5,6 +5,7 @@ import { useAtom } from "@rbxts/react-charm";
 import { Selection, StudioService } from "@rbxts/services";
 import { PluginUiController } from "Features/PluginUI/Controllers/PluginUiController";
 import { ReactCodifier } from "../../Codifiers/ReactCodifier";
+import { VanillaCodifier } from "../../Codifiers/VanillaCodifier";
 import { InstanceAST } from "../../InstanceAST/InstanceAST";
 
 @Controller()
@@ -91,7 +92,7 @@ export class CodifyingController implements OnInit, OnStart {
 		return useAtom(this.exceptions_atom_);
 	}
 
-	public CodifyInstances(instances: Instance[]): string {
+	public CodifyInstances(instances: Instance[], mode: "react" | "vanilla" = "react"): string {
 		if (instances.size() === 0) {
 			return "// No instances selected for codifying";
 		}
@@ -99,7 +100,10 @@ export class CodifyingController implements OnInit, OnStart {
 		try {
 			// Build AST from instances
 			const ast = InstanceAST.BuildAst(instances);
-			// Use ReactCodifier to convert AST to code
+			// Use the selected codifier to convert AST to code
+			if (mode === "vanilla") {
+				return VanillaCodifier.Codify(ast);
+			}
 			return ReactCodifier.Codify(ast);
 		} catch (err) {
 			return `// Error during codification: ${err}`;

@@ -43,5 +43,7 @@ export namespace CodifyingResources {
 		export const CHECKBOX_SIZE = 20;
 		export const INSTANCE_ITEM_HEIGHT = 24;
 		export const ICON_SIZE = 16;
+		export const DROPDOWN_WIDTH = 120;
+		export const DROPDOWN_OPTION_HEIGHT = 28;
 	}
 }

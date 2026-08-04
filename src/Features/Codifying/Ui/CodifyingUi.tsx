@@ -4,6 +4,7 @@ import { CodifyingController } from "../Controllers/CodifyingController";
 import { CodifyingResources } from "../Resources/CodifyingResources";
 import { Checkbox } from "./Components/Checkbox";
 import { CodifyButton } from "./Components/CodifyButton";
+import { Dropdown } from "./Components/Dropdown";
 import { InstanceItem } from "./Components/InstanceItem";
 import { OutputWindow } from "./Components/OutputWindow";
 
@@ -12,6 +13,7 @@ export function CodifyingUi() {
 	const instanceTree = codifyingController.useSelectedInstanceTree();
 	const [outputText, setOutputText] = useState("");
 	const [usePrint, setUsePrint] = useState(false);
+	const [codifierMode, setCodifierMode] = useState("react" as "react" | "vanilla");
 
 	const amount_above_limit = instanceTree.size() > CodifyingResources.MAX_DISPLAYED_INSTANCES;
 
@@ -44,8 +46,7 @@ export function CodifyingUi() {
 		}
 
 		// Get code from controller
-		const code = codifyingController.CodifyInstances(instances);
-
+		const code = codifyingController.CodifyInstances(instances, codifierMode);
 		const size_bigger_than_200k = code.size() >= 200000;
 
 		if (usePrint || size_bigger_than_200k) {
@@ -143,6 +144,12 @@ export function CodifyingUi() {
 				/>
 
 				<Checkbox checked={usePrint} onChange={setUsePrint} label="Print to Output" />
+
+				<Dropdown
+					options={["React", "Vanilla"]}
+					selected={codifierMode === "react" ? "React" : "Vanilla"}
+					onSelect={(value) => setCodifierMode(value === "React" ? "react" : "vanilla")}
+				/>
 
 				<CodifyButton onClick={handleCodify} />
 			</frame>

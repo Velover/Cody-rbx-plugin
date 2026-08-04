@@ -50,9 +50,9 @@ export function OutputWindow({ outputText, setOutputText, layoutOrder }: OutputW
 				/>
 
 				<Button
-					text="Copy to Clipboard"
+					text="Select Code (Ctrl + C to Copy)"
 					onClick={handleCopyClick}
-					size={UDim2.fromOffset(120, CodifyingResources.SIZES.BUTTON_HEIGHT)}
+					size={UDim2.fromOffset(150, CodifyingResources.SIZES.BUTTON_HEIGHT)}
 				/>
 			</frame>
 

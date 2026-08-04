@@ -2,8 +2,13 @@ export namespace TsValueCodifying {
 	export function Codify(v: unknown): string {
 		const v_type = typeOf(v);
 		if (v_type === "string") {
-			const value = v as string;
-			return `"${value.gsub('"', "'")[0].gsub("\n", "\\n")[0].gsub("\t", "\\t")[0].gsub("\\", "\\\\")[0]}"`;
+			let value = v as string;
+			value = value.gsub("\r", "")[0];
+			value = value.gsub("\\", "\\\\")[0];
+			value = value.gsub("\n", "\\n")[0];
+			value = value.gsub("\t", "\\t")[0];
+			value = value.gsub('"', '\\"')[0];
+			return `"${value}"`;
 		} else if (v_type === "number") {
 			const value = v as number;
 			if (v === math.huge) return "math.huge";
