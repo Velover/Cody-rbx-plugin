@@ -169,10 +169,10 @@ export namespace VanillaCodifier {
 			return baseName;
 		}
 		let counter = 2;
-		while (usedNames.has(`${baseName}${counter}`)) {
+		while (usedNames.has(`${baseName}_${counter}`)) {
 			counter += 1;
 		}
-		const uniqueName = `${baseName}${counter}`;
+		const uniqueName = `${baseName}_${counter}`;
 		usedNames.add(uniqueName);
 		return uniqueName;
 	}
@@ -195,10 +195,6 @@ export namespace VanillaCodifier {
 
 		const result: string[] = [];
 
-		if (isChild) {
-			result.push("{");
-		}
-
 		// Create instance
 		if (isChild && parentVarName !== undefined) {
 			result.push(`const ${varName} = new Instance("${node.ClassName}", ${parentVarName});`);
@@ -216,16 +212,19 @@ export namespace VanillaCodifier {
 			result.push(`${varName}.${prop_name} = ${prop_value};`);
 		}
 
-		// Process children — each in its own block scope
-		const childUsedNames = new Set<string>([varName]);
-		for (const child_id of node.ChildrenIds) {
-			const child_node = registry.get(child_id)!;
-			result.push(
-				NodeToCode(child_node, registry, property_exceptions_map, true, varName, childUsedNames),
-			);
-		}
-
-		if (isChild) {
+		// Process children — all in one shared scope block
+		if (node.ChildrenIds.size() > 0) {
+			result.push("{");
+			const childUsedNames = new Set<string>([varName]);
+			let firstChild = true;
+			for (const child_id of node.ChildrenIds) {
+				if (!firstChild) result.push("\n\n");
+				firstChild = false;
+				const child_node = registry.get(child_id)!;
+				result.push(
+					NodeToCode(child_node, registry, property_exceptions_map, true, varName, childUsedNames),
+				);
+			}
 			result.push("}");
 		}
 
